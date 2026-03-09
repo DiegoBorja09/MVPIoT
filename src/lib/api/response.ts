@@ -41,7 +41,7 @@ export function fromResult<T>(result: Result<T>): NextResponse {
  * Helper para manejar errores comunes de la API
  */
 export function handleApiError(error: unknown): NextResponse {
-  console.error('API error:', error);
+  console.error('API error:', JSON.stringify(error, null, 2));
 
   // Errores de validación Zod
   if (error && typeof error === 'object' && 'name' in error && error.name === 'ZodError') {
