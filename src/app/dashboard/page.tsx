@@ -139,8 +139,9 @@ export default function DashboardPage() {
                 onChange={(e) => {
                   setSelectedDevice(e.target.value);
                   const device = devices.find(d => d.device_id === e.target.value);
-                  if (device?.properties?.length > 0) {
-                    setSelectedProperty(device.properties[0].name);
+                  const firstProp = device?.properties?.[0];
+                  if (firstProp) {
+                    setSelectedProperty(firstProp.name);
                   }
                 }}
                 className="w-full p-2 border rounded-md"
