@@ -16,10 +16,16 @@ export function jsonError(
   status: number = 500,
   details?: unknown
 ): NextResponse {
-  return NextResponse.json(
-    { success: false, error, ...(details && { details }) },
-    { status }
-  );
+  const payload: { success: false; error: string; details?: unknown } = {
+    success: false,
+    error,
+  };
+
+  if (details !== undefined) {
+    payload.details = details;
+  }
+
+  return NextResponse.json(payload, { status });
 }
 
 /**
