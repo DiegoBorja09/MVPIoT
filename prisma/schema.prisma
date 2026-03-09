@@ -1,0 +1,62 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Device {
+  id         String    @id @default(uuid()) @db.Uuid
+  device_id  String    @unique
+  thing_id   String
+  webhook_id String
+  created_at DateTime  @default(now()) @db.Timestamptz(6)
+  
+  properties Property[]
+  values     PropertyValue[]
+
+  @@index([device_id])
+  @@map("devices")
+}
+
+model Property {
+  id         String    @id @default(uuid()) @db.Uuid
+  device_id  String
+  name       String
+  unit       String?
+  type       String   // 'number', 'boolean', 'string'
+  created_at DateTime  @default(now()) @db.Timestamptz(6)
+  
+  device     Device   @relation(fields: [device_id], references: [device_id], onDelete: Cascade)
+  values     PropertyValue[]
+
+  @@unique([device_id, name], name: "device_id_name")
+  @@index([device_id, name])
+  @@map("properties")
+}
+
+model PropertyValue {
+  id           String    @id @default(uuid()) @db.Uuid
+  event_id     String
+  device_id    String
+  property_id  String    @db.Uuid
+  value_raw    String    // Valor original como string
+  value_number Float?
+  value_boolean Boolean?
+  value_string String?
+  persist      Boolean   @default(true)
+  updated_at   DateTime  @db.Timestamptz(6)
+  created_by   String?
+  created_at   DateTime  @default(now()) @db.Timestamptz(6)
+  
+  device       Device    @relation(fields: [device_id], references: [device_id], onDelete: Cascade)
+  property     Property  @relation(fields: [property_id], references: [id], onDelete: Cascade)
+
+  @@unique([event_id, property_id, updated_at])
+  @@index([device_id, property_id, updated_at])
+  @@index([device_id, updated_at])
+  @@index([updated_at])
+  @@map("property_values")
+}
